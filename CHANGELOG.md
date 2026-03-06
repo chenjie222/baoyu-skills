@@ -2,6 +2,18 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.51.1 - 2026-03-06
+
+### Refactor
+- Unify Chrome CDP profile path — all skills now share `baoyu-skills/chrome-profile` instead of per-skill directories
+- Fix `baoyu-post-to-weibo` incorrectly reusing `x-browser-profile` path
+
+### Fixes
+- Remove `curl | bash` remote code execution pattern from all install instructions
+- Enforce HTTPS-only for remote image downloads in `md-to-html` scripts
+- Add redirect limit (max 5) to prevent infinite redirect loops
+- Add Security Guidelines section to CLAUDE.md
+
 ## 1.51.0 - 2026-03-06
 
 ### Features

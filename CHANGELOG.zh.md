@@ -2,6 +2,18 @@
 
 [English](./CHANGELOG.md) | 中文
 
+## 1.51.1 - 2026-03-06
+
+### 重构
+- 统一 Chrome CDP profile 路径——所有 skill 共享 `baoyu-skills/chrome-profile`，不再各自独立目录
+- 修复 `baoyu-post-to-weibo` 错误复用 `x-browser-profile` 路径的问题
+
+### 修复
+- 移除所有安装说明中的 `curl | bash` 远程代码执行模式
+- `md-to-html` 脚本强制仅允许 HTTPS 下载远程图片
+- 添加重定向次数限制（最多 5 次），防止无限重定向
+- 在 CLAUDE.md 中新增安全准则章节
+
 ## 1.51.0 - 2026-03-06
 
 ### 新功能
