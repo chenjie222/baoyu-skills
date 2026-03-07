@@ -2,6 +2,12 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.53.0 - 2026-03-06
+
+### Features
+- `baoyu-url-to-markdown`: save rendered HTML snapshot as `-captured.html` alongside markdown output
+- `baoyu-url-to-markdown`: Defuddle-first markdown conversion with automatic fallback to legacy Readability/selector extractor
+
 ## 1.52.0 - 2026-03-06
 
 ### Features

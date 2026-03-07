@@ -2,6 +2,12 @@
 
 [English](./CHANGELOG.md) | 中文
 
+## 1.53.0 - 2026-03-06
+
+### 新功能
+- `baoyu-url-to-markdown`：将渲染后的 HTML 快照保存为 `-captured.html`，与 Markdown 文件并列输出
+- `baoyu-url-to-markdown`：优先使用 Defuddle 转换，失败时自动回退到旧版 Readability/选择器提取器
+
 ## 1.52.0 - 2026-03-06
 
 ### 新功能
