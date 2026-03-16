@@ -102,17 +102,32 @@ async function fetch_cookies_from_existing_chrome(
   timeoutMs: number,
   verbose: boolean,
 ): Promise<CookieMap | null> {
-  const port = await discoverRunningChromeDebugPort();
-  if (port === null) return null;
+  const discovered = await discoverRunningChromeDebugPort();
+  if (discovered === null) return null;
 
-  if (verbose) logger.info(`Found existing Chrome on port ${port}. Extracting cookies...`);
+  if (verbose) logger.info(`Found existing Chrome on port ${discovered.port}. Connecting via WebSocket...`);
 
   let cdp: CdpConnection | null = null;
   let createdTab = false;
   let targetId: string | null = null;
   try {
-    const wsUrl = await waitForChromeDebugPort(port, 10_000, { includeLastError: true });
-    cdp = await CdpConnection.connect(wsUrl, 15_000);
+    const connectStart = Date.now();
+    const connectTimeout = 30_000;
+    let lastConnErr: unknown = null;
+    while (Date.now() - connectStart < connectTimeout) {
+      try {
+        cdp = await CdpConnection.connect(discovered.wsUrl, 5_000);
+        break;
+      } catch (e) {
+        lastConnErr = e;
+        if (verbose) logger.debug(`WebSocket connect attempt failed: ${e instanceof Error ? e.message : String(e)}, retrying...`);
+        await sleep(1000);
+      }
+    }
+    if (!cdp) {
+      if (verbose) logger.debug(`Could not connect to Chrome after ${connectTimeout / 1000}s: ${lastConnErr instanceof Error ? lastConnErr.message : String(lastConnErr)}`);
+      return null;
+    }
 
     const targets = await cdp.send<{ targetInfos: Array<{ targetId: string; url: string; type: string }> }>('Target.getTargets');
     const hasGeminiTab = targets.targetInfos.some(

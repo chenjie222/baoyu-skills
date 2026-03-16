@@ -45,6 +45,11 @@ type FindExistingChromeDebugPortOptions = {
 
 export type ChromeChannel = "stable" | "beta" | "canary" | "dev";
 
+export type DiscoveredChrome = {
+  port: number;
+  wsUrl: string;
+};
+
 type DiscoverRunningChromeOptions = {
   channels?: ChromeChannel[];
   timeoutMs?: number;
@@ -180,16 +185,33 @@ async function isDebugPortReady(port: number, timeoutMs = 3_000): Promise<boolea
   }
 }
 
+function isPortListening(port: number, timeoutMs = 3_000): Promise<boolean> {
+  return new Promise((resolve) => {
+    const socket = new net.Socket();
+    const timer = setTimeout(() => { socket.destroy(); resolve(false); }, timeoutMs);
+    socket.once("connect", () => { clearTimeout(timer); socket.destroy(); resolve(true); });
+    socket.once("error", () => { clearTimeout(timer); resolve(false); });
+    socket.connect(port, "127.0.0.1");
+  });
+}
+
+function parseDevToolsActivePort(filePath: string): { port: number; wsPath: string } | null {
+  try {
+    const content = fs.readFileSync(filePath, "utf-8");
+    const lines = content.split(/\r?\n/);
+    const port = Number.parseInt(lines[0]?.trim() ?? "", 10);
+    const wsPath = lines[1]?.trim();
+    if (port > 0 && wsPath) return { port, wsPath };
+  } catch {}
+  return null;
+}
+
 export async function findExistingChromeDebugPort(options: FindExistingChromeDebugPortOptions): Promise<number | null> {
   const timeoutMs = options.timeoutMs ?? 3_000;
-  const portFile = path.join(options.profileDir, "DevToolsActivePort");
+  const parsed = parseDevToolsActivePort(path.join(options.profileDir, "DevToolsActivePort"));
 
-  try {
-    const content = fs.readFileSync(portFile, "utf-8");
-    const [portLine] = content.split(/\r?\n/);
-    const port = Number.parseInt(portLine?.trim() ?? "", 10);
-    if (port > 0 && await isDebugPortReady(port, timeoutMs)) return port;
-  } catch {}
+  if (parsed && await isPortListening(parsed.port, timeoutMs)) return parsed.port;
+  if (parsed && parsed.port > 0 && await isDebugPortReady(parsed.port, timeoutMs)) return parsed.port;
 
   if (process.platform === "win32") return null;
 
@@ -248,19 +270,17 @@ export function getDefaultChromeUserDataDirs(channels: ChromeChannel[] = ["stabl
   return dirs;
 }
 
-export async function discoverRunningChromeDebugPort(options: DiscoverRunningChromeOptions = {}): Promise<number | null> {
+export async function discoverRunningChromeDebugPort(options: DiscoverRunningChromeOptions = {}): Promise<DiscoveredChrome | null> {
   const channels = options.channels ?? ["stable", "beta", "canary", "dev"];
   const timeoutMs = options.timeoutMs ?? 3_000;
 
   const userDataDirs = getDefaultChromeUserDataDirs(channels);
   for (const dir of userDataDirs) {
-    const portFile = path.join(dir, "DevToolsActivePort");
-    try {
-      const content = fs.readFileSync(portFile, "utf-8");
-      const [portLine] = content.split(/\r?\n/);
-      const port = Number.parseInt(portLine?.trim() ?? "", 10);
-      if (port > 0 && await isDebugPortReady(port, timeoutMs)) return port;
-    } catch {}
+    const parsed = parseDevToolsActivePort(path.join(dir, "DevToolsActivePort"));
+    if (!parsed) continue;
+    if (await isPortListening(parsed.port, timeoutMs)) {
+      return { port: parsed.port, wsUrl: `ws://127.0.0.1:${parsed.port}${parsed.wsPath}` };
+    }
   }
 
   if (process.platform !== "win32") {
@@ -274,7 +294,12 @@ export async function discoverRunningChromeDebugPort(options: DiscoverRunningChr
         for (const line of lines) {
           const portMatch = line.match(/--remote-debugging-port=(\d+)/);
           const port = Number.parseInt(portMatch?.[1] ?? "", 10);
-          if (port > 0 && await isDebugPortReady(port, timeoutMs)) return port;
+          if (port > 0 && await isDebugPortReady(port, timeoutMs)) {
+            try {
+              const version = await fetchJson<{ webSocketDebuggerUrl?: string }>(`http://127.0.0.1:${port}/json/version`, { timeoutMs });
+              if (version.webSocketDebuggerUrl) return { port, wsUrl: version.webSocketDebuggerUrl };
+            } catch {}
+          }
         }
       }
     } catch {}
