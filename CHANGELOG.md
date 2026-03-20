@@ -2,6 +2,11 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.73.3 - 2026-03-20
+
+### Fixes
+- `baoyu-post-to-wechat`: fix placeholder replacement to avoid shorter placeholders matching longer numbered variants
+
 ## 1.73.2 - 2026-03-20
 
 ### Fixes
