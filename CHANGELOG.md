@@ -2,6 +2,17 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.79.1 - 2026-03-23
+
+### Fixes
+- Consolidate to single plugin to prevent duplicate skill registration (by @TyrealQ)
+- `baoyu-article-illustrator`: remove opacity parameter from watermark prompt
+- `baoyu-comic`: fix Doraemon naming spacing and remove opacity from watermark prompt
+- `baoyu-xhs-images`: remove opacity from watermark prompt and fix CJK spacing
+
+### Documentation
+- Update project documentation to reflect single-plugin architecture
+
 ## 1.79.0 - 2026-03-22
 
 ### Features
