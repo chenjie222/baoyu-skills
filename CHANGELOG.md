@@ -2,6 +2,11 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.97.1 - 2026-04-09
+
+### Fixes
+- `baoyu-image-cards`: rename palette color roles from "Zone N" to "Block Color" to prevent AI rendering labels as visible text in images
+
 ## 1.97.0 - 2026-04-09
 
 ### Features

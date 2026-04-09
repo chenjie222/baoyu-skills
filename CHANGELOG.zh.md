@@ -2,6 +2,11 @@
 
 [English](./CHANGELOG.md) | 中文
 
+## 1.97.1 - 2026-04-09
+
+### 修复
+- `baoyu-image-cards`：将配色方案中 "Zone N" 角色名改为 "Block Color"，防止 AI 将标签文字渲染到图片中
+
 ## 1.97.0 - 2026-04-09
 
 ### 新功能
