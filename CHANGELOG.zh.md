@@ -2,6 +2,14 @@
 
 [English](./CHANGELOG.md) | 中文
 
+## 1.98.0 - 2026-04-10
+
+### 新功能
+- `baoyu-xhs-images`：恢复为正式技能（移除废弃警告）
+- `baoyu-xhs-images`：新增 `sketch-notes` 风格 —— 手绘教育信息图，马卡龙配色，波动线条，暖奶油背景
+- `baoyu-xhs-images`：新增配色系统（`macaron`、`warm`、`neon`），支持 `--palette` 参数覆盖风格默认颜色
+- `baoyu-xhs-images`：新增 3 个预设：`hand-drawn-edu`、`sketch-card`、`sketch-summary`
+
 ## 1.97.1 - 2026-04-09
 
 ### 修复

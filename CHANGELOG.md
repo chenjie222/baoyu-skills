@@ -2,6 +2,14 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.98.0 - 2026-04-10
+
+### Features
+- `baoyu-xhs-images`: Restore as active skill (remove deprecated warning)
+- `baoyu-xhs-images`: Add `sketch-notes` style — hand-drawn educational infographic with macaron pastels, wobble lines, and warm cream background
+- `baoyu-xhs-images`: Add palette system (`macaron`, `warm`, `neon`) as optional `--palette` color override dimension
+- `baoyu-xhs-images`: Add 3 new presets: `hand-drawn-edu`, `sketch-card`, `sketch-summary`
+
 ## 1.97.1 - 2026-04-09
 
 ### Fixes
