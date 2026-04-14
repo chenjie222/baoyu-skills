@@ -2,6 +2,11 @@
 
 English | [中文](./CHANGELOG.zh.md)
 
+## 1.105.0 - 2026-04-13
+
+### Features
+- `baoyu-diagram`: unify to analyze→confirm→generate workflow — remove single/multi mode split; skill now analyzes any input material, recommends diagram types and splitting strategy, confirms once, then generates all diagrams
+
 ## 1.104.0 - 2026-04-13
 
 ### Features
