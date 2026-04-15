@@ -11,7 +11,7 @@ description: EXTEND.md YAML schema for baoyu-imagine user preferences
 ---
 version: 1
 
-default_provider: null      # google|openai|azure|openrouter|dashscope|zai|minimax|replicate|null (null = auto-detect)
+default_provider: null      # google|openai|azure|openrouter|dashscope|zai|minimax|replicate|baicai|null (null = auto-detect)
 
 default_quality: null       # normal|2k|null (null = use default: 2k)
 
@@ -30,6 +30,7 @@ default_model:
   zai: null                 # e.g., "glm-image"
   minimax: null             # e.g., "image-01"
   replicate: null           # e.g., "google/nano-banana-2"
+  baicai: null              # e.g., "FLUX.1-dev", "Wan2.5-Image"
 
 batch:
   max_workers: 10
@@ -58,6 +59,9 @@ batch:
     minimax:
       concurrency: 3
       start_interval_ms: 1100
+    baicai:
+      concurrency: 3
+      start_interval_ms: 1100
 ---
 ```
 
@@ -79,6 +83,7 @@ batch:
 | `default_model.zai` | string\|null | null | Z.AI default model |
 | `default_model.minimax` | string\|null | null | MiniMax default model |
 | `default_model.replicate` | string\|null | null | Replicate default model |
+| `default_model.baicai` | string\|null | null | Baicai default model (e.g., `FLUX.1-dev`) |
 | `batch.max_workers` | int\|null | 10 | Batch worker cap |
 | `batch.provider_limits.<provider>.concurrency` | int\|null | provider default | Max simultaneous requests per provider |
 | `batch.provider_limits.<provider>.start_interval_ms` | int\|null | provider default | Minimum gap between request starts per provider |
@@ -113,6 +118,7 @@ default_model:
   zai: "glm-image"
   minimax: "image-01"
   replicate: "google/nano-banana-2"
+  baicai: "FLUX.1-dev"
 batch:
   max_workers: 10
   provider_limits:
@@ -129,6 +135,9 @@ batch:
       concurrency: 3
       start_interval_ms: 1100
     minimax:
+      concurrency: 3
+      start_interval_ms: 1100
+    baicai:
       concurrency: 3
       start_interval_ms: 1100
 ---

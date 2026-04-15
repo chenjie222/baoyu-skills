@@ -1,6 +1,6 @@
 ---
 name: baoyu-imagine
-description: AI image generation with OpenAI, Azure OpenAI, Google, OpenRouter, DashScope, Z.AI GLM-Image, MiniMax, Jimeng, Seedream and Replicate APIs. Supports text-to-image, reference images, aspect ratios, and batch generation from saved prompt files. Sequential by default; use batch parallel generation when the user already has multiple prompts or wants stable multi-image throughput. Use when user asks to generate, create, or draw images.
+description: AI image generation with OpenAI, Azure OpenAI, Google, OpenRouter, DashScope, Z.AI GLM-Image, MiniMax, Jimeng, Seedream, Baicai Infer (FLUX/HiDream/Qwen-Image/Wan/Kling/JiMeng) and Replicate APIs. Supports text-to-image, reference images, aspect ratios, and batch generation from saved prompt files. Sequential by default; use batch parallel generation when the user already has multiple prompts or wants stable multi-image throughput. Use when user asks to generate, create, or draw images.
 version: 1.57.0
 metadata:
   openclaw:
@@ -13,7 +13,7 @@ metadata:
 
 # Image Generation (AI SDK)
 
-Official API-based image generation. Supports OpenAI, Azure OpenAI, Google, OpenRouter, DashScope (阿里通义万象), Z.AI GLM-Image, MiniMax, Jimeng (即梦), Seedream (豆包) and Replicate providers.
+Official API-based image generation. Supports OpenAI, Azure OpenAI, Google, OpenRouter, DashScope (阿里通义万象), Z.AI GLM-Image, MiniMax, Jimeng (即梦), Seedream (豆包), Baicai Infer (白菜 — FLUX / HiDream / Qwen-Image / Wan / Kling / JiMeng) and Replicate providers.
 
 ## Script Directory
 
@@ -109,6 +109,15 @@ ${BUN_X} {baseDir}/scripts/main.ts --prompt "一张带清晰中文标题的科�
 # Z.AI GLM-image with explicit custom size
 ${BUN_X} {baseDir}/scripts/main.ts --prompt "A science illustration with labels" --image out.png --provider zai --model glm-image --size 1472x1088
 
+# Baicai Infer FLUX (immediate URL response)
+${BUN_X} {baseDir}/scripts/main.ts --prompt "a red fox in snow" --image out.png --provider baicai --model FLUX.1-dev
+
+# Baicai Infer commercial model (task-based, polled up to 20 min)
+${BUN_X} {baseDir}/scripts/main.ts --prompt "cinematic city skyline" --image out.png --provider baicai --model Wan2.5-Image --ar 16:9 --quality 2k
+
+# Baicai Infer image-edit with a single reference
+${BUN_X} {baseDir}/scripts/main.ts --prompt "studio ghibli style" --image out.png --provider baicai --model FLUX.1-Kontext-dev --ref portrait.png
+
 # MiniMax
 ${BUN_X} {baseDir}/scripts/main.ts --prompt "A fashion editorial portrait by a bright studio window" --image out.jpg --provider minimax
 
@@ -170,14 +179,14 @@ Paths in `promptFiles`, `image`, and `ref` are resolved relative to the batch fi
 | `--image <path>` | Output image path (required in single-image mode) |
 | `--batchfile <path>` | JSON batch file for multi-image generation |
 | `--jobs <count>` | Worker count for batch mode (default: auto, max from config, built-in default 10) |
-| `--provider google\|openai\|azure\|openrouter\|dashscope\|zai\|minimax\|jimeng\|seedream\|replicate` | Force provider (default: auto-detect) |
+| `--provider google\|openai\|azure\|openrouter\|dashscope\|zai\|minimax\|jimeng\|seedream\|replicate\|baicai` | Force provider (default: auto-detect) |
 | `--model <id>`, `-m` | Model ID (Google: `gemini-3-pro-image-preview`; OpenAI: `gpt-image-1.5`; Azure: deployment name such as `gpt-image-1.5` or `image-prod`; OpenRouter: `google/gemini-3.1-flash-image-preview`; DashScope: `qwen-image-2.0-pro`; Z.AI: `glm-image`; MiniMax: `image-01`) |
 | `--ar <ratio>` | Aspect ratio (e.g., `16:9`, `1:1`, `4:3`) |
 | `--size <WxH>` | Size (e.g., `1024x1024`) |
 | `--quality normal\|2k` | Quality preset (default: `2k`) |
 | `--imageSize 1K\|2K\|4K` | Image size for Google/OpenRouter (default: from quality) |
 | `--imageApiDialect openai-native\|ratio-metadata` | OpenAI-compatible image API dialect. Use `ratio-metadata` when the endpoint is OpenAI-compatible but expects aspect-ratio `size` plus `metadata.resolution` instead of pixel `size` |
-| `--ref <files...>` | Reference images. Supported by Google multimodal, OpenAI GPT Image edits, Azure OpenAI edits (PNG/JPG only), OpenRouter multimodal models, Replicate supported families, MiniMax subject-reference, and Seedream 5.0/4.5/4.0. Not supported by Jimeng, Seedream 3.0, or removed SeedEdit 3.0 |
+| `--ref <files...>` | Reference images. Supported by Google multimodal, OpenAI GPT Image edits, Azure OpenAI edits (PNG/JPG only), OpenRouter multimodal models, Replicate supported families, MiniMax subject-reference, Seedream 5.0/4.5/4.0, and Baicai img2img / image-edit models (exactly 1 reference; FLUX.1-Kontext-dev and Qwen-Image-Edit* are routed as image-edit). Not supported by Jimeng, Seedream 3.0, or removed SeedEdit 3.0 |
 | `--n <count>` | Number of images. Replicate currently supports only `--n 1` because this path saves exactly one output image |
 | `--json` | JSON output |
 
@@ -197,6 +206,7 @@ Paths in `promptFiles`, `image`, and `ref` are resolved relative to the batch fi
 | `JIMENG_ACCESS_KEY_ID` | Jimeng (即梦) Volcengine access key |
 | `JIMENG_SECRET_ACCESS_KEY` | Jimeng (即梦) Volcengine secret key |
 | `ARK_API_KEY` | Seedream (豆包) Volcengine ARK API key |
+| `BAICAI_API_KEY` | Baicai Infer API key |
 | `OPENAI_IMAGE_MODEL` | OpenAI model override |
 | `AZURE_OPENAI_DEPLOYMENT` | Azure default deployment name |
 | `AZURE_OPENAI_IMAGE_MODEL` | Backward-compatible alias for Azure default deployment/model name |
@@ -209,6 +219,7 @@ Paths in `promptFiles`, `image`, and `ref` are resolved relative to the batch fi
 | `REPLICATE_IMAGE_MODEL` | Replicate model override (default: google/nano-banana-2) |
 | `JIMENG_IMAGE_MODEL` | Jimeng model override (default: jimeng_t2i_v40) |
 | `SEEDREAM_IMAGE_MODEL` | Seedream model override (default: doubao-seedream-5-0-260128) |
+| `BAICAI_IMAGE_MODEL` | Baicai model override (default: `FLUX.1-dev`) |
 | `OPENAI_BASE_URL` | Custom OpenAI endpoint |
 | `OPENAI_IMAGE_API_DIALECT` | OpenAI-compatible image API dialect override (`openai-native` or `ratio-metadata`) |
 | `AZURE_OPENAI_BASE_URL` | Azure resource endpoint or deployment endpoint |
@@ -225,6 +236,7 @@ Paths in `promptFiles`, `image`, and `ref` are resolved relative to the batch fi
 | `JIMENG_BASE_URL` | Custom Jimeng endpoint (default: `https://visual.volcengineapi.com`) |
 | `JIMENG_REGION` | Jimeng region (default: `cn-north-1`) |
 | `SEEDREAM_BASE_URL` | Custom Seedream endpoint (default: `https://ark.cn-beijing.volces.com/api/v3`) |
+| `BAICAI_BASE_URL` | Custom Baicai endpoint (default: `https://cloud.baicaiinfer.com`) |
 | `BAOYU_IMAGE_GEN_MAX_WORKERS` | Override batch worker cap |
 | `BAOYU_IMAGE_GEN_<PROVIDER>_CONCURRENCY` | Override provider concurrency, e.g. `BAOYU_IMAGE_GEN_REPLICATE_CONCURRENCY` |
 | `BAOYU_IMAGE_GEN_<PROVIDER>_START_INTERVAL_MS` | Override provider start gap, e.g. `BAOYU_IMAGE_GEN_REPLICATE_START_INTERVAL_MS` |
@@ -336,6 +348,31 @@ Official references:
 - [GLM-Image Guide](https://docs.z.ai/guides/image/glm-image)
 - [Generate Image API](https://docs.z.ai/api-reference/image/generate-image)
 
+### Baicai Infer Models
+
+Use `--provider baicai` or set `BAICAI_API_KEY` / `default_model.baicai` / `BAICAI_IMAGE_MODEL`. Endpoint: `https://cloud.baicaiinfer.com` (override via `BAICAI_BASE_URL`).
+
+Baicai exposes two model families routed automatically by model ID:
+
+- **Open-source models** (default payload uses `width` + `height`). Known IDs:
+  - `FLUX.1-dev` (default), `FLUX.2-dev`, `FLUX.1-schnell`, `FLUX.1-Kontext-dev`
+  - `HiDream-I1-Full`, `HiDream-I1-Dev`, `HiDream-I1-Fast`
+  - `Qwen-Image`, `Qwen-Image-Edit`, `Qwen-Image-Edit-2509`
+  - `Kolors`, `HunyuanDiT`, `SD3.5-Large`, `stable-diffusion-v1-5`, `Z-Image-Turbo`
+- **Commercial models** (payload uses `resolution` + `aspect_ratio`). Any model ID not in the open-source set is treated as commercial, so new IDs (`Wan2.5-*`, `Wan2.6-*`, `Kling-o1-*`, `Kling-v2-*`, `JiMeng-*`, `Gemini-2-5-Flash-*`, etc.) work without code changes.
+
+Behavior:
+
+- FLUX family returns the image URL directly in the first response. Other models return a `taskId` and `baoyu-imagine` polls `/v1/comfyui/tasks/{taskId}/status` every 10 s up to 20 minutes, then fetches `/result`.
+- Open-source: `--size WxH` and `--ar` are supported; width/height are rounded to multiples of 64 and clamped to `[512, 2048]`.
+- Commercial: `--size` is rejected; `--ar` must be one of `1:1 16:9 9:16 4:3 3:4 3:2 2:3 21:9 9:21`; `--imageSize` (or `--quality`) maps to `resolution` (`1K|2K|4K`).
+- `--ref` accepts at most one image. Local files are auto-uploaded to `/v1/resources/upload`; HTTPS URLs pass through. `FLUX.1-Kontext-dev`, `Qwen-Image-Edit`, and `Qwen-Image-Edit-2509` are routed as `image-edit`; other models with a reference are routed as `img2img`.
+- Multi-reference (`img-multi2img`) is not yet supported in this skill version; `--n > 1` is rejected (run multiple tasks instead).
+
+Official references:
+
+- [Baicai Infer API](https://cloud.baicaiinfer.com)
+
 ### MiniMax Models
 
 Use `--model image-01` or set `default_model.minimax` / `MINIMAX_IMAGE_MODEL` when the user wants MiniMax image generation.
@@ -421,10 +458,10 @@ ${BUN_X} {baseDir}/scripts/main.ts --prompt "A cat" --image out.png --provider r
 
 ## Provider Selection
 
-1. `--ref` provided + no `--provider` → auto-select Google first, then OpenAI, then Azure, then OpenRouter, then Replicate, then Seedream, then MiniMax (MiniMax subject reference is more specialized toward character/portrait consistency)
-2. `--provider` specified → use it (if `--ref`, must be `google`, `openai`, `azure`, `openrouter`, `replicate`, `seedream`, or `minimax`)
+1. `--ref` provided + no `--provider` → auto-select Google first, then OpenAI, then Azure, then OpenRouter, then Replicate, then Seedream, then MiniMax, then Baicai (MiniMax subject reference is more specialized toward character/portrait consistency; Baicai is a generic img2img/image-edit fallback)
+2. `--provider` specified → use it (if `--ref`, must be `google`, `openai`, `azure`, `openrouter`, `replicate`, `seedream`, `minimax`, or `baicai`)
 3. Only one API key available → use that provider
-4. Multiple available → default to Google, then OpenAI, Azure, OpenRouter, DashScope, Z.AI, MiniMax, Replicate, Jimeng, Seedream
+4. Multiple available → default to Google, then OpenAI, Azure, OpenRouter, DashScope, Z.AI, MiniMax, Replicate, Jimeng, Seedream, Baicai
 
 ## Quality Presets
 
