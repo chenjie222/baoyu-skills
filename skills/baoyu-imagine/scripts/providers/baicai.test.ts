@@ -113,10 +113,13 @@ test("baicai getBaseUrl trims trailing slash and respects override", (t) => {
   assert.equal(getBaseUrl(), "https://proxy.example.com");
 });
 
-test("baicai model family: FLUX open-source, Wan commercial, unknown commercial", () => {
+test("baicai model family: FLUX open-source, Wan/Gemini commercial, unknown commercial", () => {
   assert.equal(getModelFamily("FLUX.1-dev"), "open-source");
   assert.equal(getModelFamily("Qwen-Image-Edit"), "open-source");
+  assert.equal(getModelFamily("Qwen-Image-T2I"), "open-source");
   assert.equal(getModelFamily("Wan2.5-Image"), "commercial");
+  assert.equal(getModelFamily("Gemini-2-T2I"), "commercial");
+  assert.equal(getModelFamily("Gemini-2-image-Edit"), "commercial");
   assert.equal(getModelFamily("brand-new-model"), "commercial");
 });
 
@@ -131,11 +134,23 @@ test("baicai detectTaskType covers the truth table", () => {
     "image-edit",
   );
   assert.equal(
+    detectTaskType("Gemini-2-image-Edit", makeArgs({ referenceImages: ["ref.png"] })),
+    "image-edit",
+  );
+  assert.equal(
+    detectTaskType("Wan2.6-Image-Edit", makeArgs({ referenceImages: ["ref.png"] })),
+    "image-edit",
+  );
+  assert.equal(
     detectTaskType("FLUX.1-dev", makeArgs({ referenceImages: ["ref.png"] })),
     "img2img",
   );
   assert.equal(
     detectTaskType("Wan2.5-Image", makeArgs({ referenceImages: ["ref.png"] })),
+    "img2img",
+  );
+  assert.equal(
+    detectTaskType("Gemini-2-T2I", makeArgs({ referenceImages: ["ref.png"] })),
     "img2img",
   );
   assert.throws(
@@ -163,9 +178,10 @@ test("baicai resolveOpenSourceSize handles defaults, --size, and --ar", () => {
   );
 });
 
-test("baicai resolveCommercialResolution respects imageSize then quality", () => {
+test("baicai resolveCommercialResolution respects imageSize then quality, including 0.5k", () => {
   assert.equal(resolveCommercialResolution({ imageSize: "4K", quality: null }), "4k");
   assert.equal(resolveCommercialResolution({ imageSize: "2K", quality: null }), "2k");
+  assert.equal(resolveCommercialResolution({ imageSize: "0.5K" as "1K", quality: null }), "0.5k");
   assert.equal(resolveCommercialResolution({ imageSize: null, quality: "2k" }), "2k");
   assert.equal(resolveCommercialResolution({ imageSize: null, quality: "normal" }), "1k");
   assert.equal(resolveCommercialResolution({ imageSize: null, quality: null }), "1k");

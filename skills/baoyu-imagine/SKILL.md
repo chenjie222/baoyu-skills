@@ -357,17 +357,22 @@ Baicai exposes two model families routed automatically by model ID:
 - **Open-source models** (default payload uses `width` + `height`). Known IDs:
   - `FLUX.1-dev` (default), `FLUX.2-dev`, `FLUX.1-schnell`, `FLUX.1-Kontext-dev`
   - `HiDream-I1-Full`, `HiDream-I1-Dev`, `HiDream-I1-Fast`
-  - `Qwen-Image`, `Qwen-Image-Edit`, `Qwen-Image-Edit-2509`
+  - `Qwen-Image-T2I`, `Qwen-Image-I2I`, `Qwen-Image-Edit`, `Qwen-Image-Edit-2509`
   - `Kolors`, `HunyuanDiT`, `SD3.5-Large`, `stable-diffusion-v1-5`, `Z-Image-Turbo`
-- **Commercial models** (payload uses `resolution` + `aspect_ratio`). Any model ID not in the open-source set is treated as commercial, so new IDs (`Wan2.5-*`, `Wan2.6-*`, `Kling-o1-*`, `Kling-v2-*`, `JiMeng-*`, `Gemini-2-5-Flash-*`, etc.) work without code changes.
+- **Commercial models** (payload uses `resolution` + `aspect_ratio`). Any model ID not in the open-source set is treated as commercial, so new IDs work without code changes. Known commercial IDs:
+  - **Gemini / Nano-Banana 2 (香蕉2)**: `Gemini-2-T2I`, `Gemini-2-image-Edit`, `Gemini-2-5-Flash-image-T2I`, `Gemini-2-5-Flash-image-edit`
+  - **Wan**: `Wan2.5-T2I-Preview`, `Wan2.5-I2I-Preview-Edit`, `Wan2.6-T2I`, `Wan2.6-Image-Edit`
+  - **Kling**: `Kling-o1-T2I`, `Kling-o1-I2I`, `Kling-v2-T2I`, `Kling-v2-I2I`, `Kling-v2-1-T2I`, `Kling-v2-1-I2I`
+  - **JiMeng**: `JiMeng-T2I-V30`, `JiMeng-Edit-V30`, `JiMeng-T2I-V31`, `JiMeng-T2I-V40`, `JiMeng-I2I-V40`, `JiMeng-T2I-V40-Auto-ImageNum`, `JiMeng-I2I-V40-Auto-ImageNum`
 
 Behavior:
 
 - FLUX family returns the image URL directly in the first response. Other models return a `taskId` and `baoyu-imagine` polls `/v1/comfyui/tasks/{taskId}/status` every 10 s up to 20 minutes, then fetches `/result`.
 - Open-source: `--size WxH` and `--ar` are supported; width/height are rounded to multiples of 64 and clamped to `[512, 2048]`.
-- Commercial: `--size` is rejected; `--ar` must be one of `1:1 16:9 9:16 4:3 3:4 3:2 2:3 21:9 9:21`; `--imageSize` (or `--quality`) maps to `resolution` (`1K|2K|4K`).
-- `--ref` accepts at most one image. Local files are auto-uploaded to `/v1/resources/upload`; HTTPS URLs pass through. `FLUX.1-Kontext-dev`, `Qwen-Image-Edit`, and `Qwen-Image-Edit-2509` are routed as `image-edit`; other models with a reference are routed as `img2img`.
+- Commercial: `--size` is rejected; `--ar` must be one of `1:1 16:9 9:16 4:3 3:4 3:2 2:3 21:9 9:21 8:1`; `--imageSize` (or `--quality`) maps to `resolution` (`0.5K|1K|2K|4K`; 0.5K is supported by Gemini-2 / Nano-Banana 2).
+- `--ref` accepts at most one image. Local files are auto-uploaded to `/v1/resources/upload`; HTTPS URLs pass through. Edit-capable models (`FLUX.1-Kontext-dev`, `Qwen-Image-Edit*`, `Gemini-2-image-Edit`, `Gemini-2-5-Flash-image-edit`, `Wan*-Edit`, `Kling-*-I2I`, `JiMeng-Edit-*`, `JiMeng-I2I-*`) are routed as `image-edit`; other models with a reference are routed as `img2img`.
 - Multi-reference (`img-multi2img`) is not yet supported in this skill version; `--n > 1` is rejected (run multiple tasks instead).
+- Video models (e.g. `Doubao-Seedance-2.0-*`) are **not** supported in this skill; use `baicai-video` skill or a dedicated video skill instead.
 
 Official references:
 

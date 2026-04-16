@@ -18,6 +18,8 @@ const OPEN_SOURCE_MODELS = new Set<string>([
   "HiDream-I1-Dev",
   "HiDream-I1-Fast",
   "Qwen-Image",
+  "Qwen-Image-T2I",
+  "Qwen-Image-I2I",
   "Qwen-Image-Edit",
   "Qwen-Image-Edit-2509",
   "Kolors",
@@ -31,6 +33,16 @@ const EDIT_CAPABLE_MODELS = new Set<string>([
   "FLUX.1-Kontext-dev",
   "Qwen-Image-Edit",
   "Qwen-Image-Edit-2509",
+  "Gemini-2-image-Edit",
+  "Wan2.5-I2I-Preview-Edit",
+  "Wan2.6-Image-Edit",
+  "Kling-o1-I2I",
+  "Kling-v2-I2I",
+  "Kling-v2-1-I2I",
+  "JiMeng-Edit-V30",
+  "JiMeng-I2I-V40",
+  "JiMeng-I2I-V40-Auto-ImageNum",
+  "Gemini-2-5-Flash-image-edit",
 ]);
 
 const COMMERCIAL_AR_ALLOWED = new Set<string>([
@@ -43,6 +55,7 @@ const COMMERCIAL_AR_ALLOWED = new Set<string>([
   "2:3",
   "21:9",
   "9:21",
+  "8:1",
 ]);
 
 const OPEN_SOURCE_SIZE_STEP = 64;
@@ -51,7 +64,7 @@ const OPEN_SOURCE_MAX_EDGE = 2048;
 
 export type BaicaiModelFamily = "open-source" | "commercial";
 export type BaicaiTaskType = "txt2img" | "img2img" | "image-edit";
-export type BaicaiResolution = "1k" | "2k" | "4k";
+export type BaicaiResolution = "0.5k" | "1k" | "2k" | "4k";
 
 type OpenSourceInput = {
   prompt: string;
@@ -228,6 +241,7 @@ export function resolveCommercialResolution(
   if (args.imageSize === "4K") return "4k";
   if (args.imageSize === "2K") return "2k";
   if (args.imageSize === "1K") return "1k";
+  if ((args.imageSize as string) === "0.5K") return "0.5k";
   if (args.quality === "2k") return "2k";
   return "1k";
 }
